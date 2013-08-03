@@ -59,7 +59,7 @@ def create_cms_db(outfile_name):
             , drg_id INTEGER NOT NULL
             , provider_id INTEGER NOT NULL
             , num_discharged INTEGER NULL
-            , avg_covered REAL NULL
+            , avg_charge REAL NULL
             , avg_payment REAL NULL
             )""")
 
@@ -68,7 +68,7 @@ def create_cms_db(outfile_name):
             , apc_id INTEGER NOT NULL
             , provider_id INTEGER NOT NULL
             , num_discharged INTEGER NULL
-            , avg_covered REAL NULL
+            , avg_charge REAL NULL
             , avg_payment REAL NULL
             )""")
 
