@@ -5,9 +5,9 @@ import os
 from create_cms_db import create_cms_db
 
 #TODO: In blog, mention had to save this as CSV because only Excel provided
-region_crosswalk_file = 'ZipHsaHrr11.csv'
-inpatient_file = 'Medicare_Provider_Charge_Inpatient_DRG100_FY2011.csv'
-outpatient_file = 'Medicare_Provider_Charge_Outpatient_APC30_CY2011.csv'
+region_crosswalk_file = 'data/ZipHsaHrr11.csv'
+inpatient_file = 'data/Medicare_Provider_Charge_Inpatient_DRG100_FY2011.csv'
+outpatient_file = 'data/Medicare_Provider_Charge_Outpatient_APC30_CY2011.csv'
 
 db_name = ''
 
