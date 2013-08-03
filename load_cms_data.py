@@ -262,3 +262,7 @@ with sqlite3.connect(db_name) as conn:
                 v['num_discharged'], v['avg_charge'],
                 v['avg_payment'])
         )
+
+    cursor.close()
+
+print "DONE!"
