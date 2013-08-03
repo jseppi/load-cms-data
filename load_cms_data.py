@@ -91,7 +91,9 @@ with open(inpatient_file, 'rb') as csvfile:
         drg_id = int(drg_defn.split(' - ')[0])
         drg_name = drg_defn.split(' - ')[1]
         
-        drgs[drg_id] = { 'name': drg_name }
+        drgs[drg_id] = { 
+            'name': drg_name 
+        }
 
         provider_id = int(row[1])
         provider_name = row[2]
@@ -111,14 +113,14 @@ with open(inpatient_file, 'rb') as csvfile:
         }
 
         num_discharged = int(row[8])
-        avg_covered = float(row[9])
+        avg_charge = float(row[9])
         avg_payment = float(row[10])
 
         inpatient_payments[curr_inpatient_payment_id] = {
             'drg_id': drg_id,
             'provider_id': provider_id,
             'num_discharged': num_discharged,
-            'avg_covered': avg_covered,
+            'avg_charge': avg_charge,
             'avg_payment': avg_payment
         }
 
@@ -143,7 +145,9 @@ with open(outpatient_file, 'rb') as csvfile:
         apc_id = int(apc_defn.split(' - ')[0])
         apc_name = apc_defn.split(' - ')[1]
 
-        apcs[apc_id] = { 'name': apc_name }
+        apcs[apc_id] = { 
+            'name': apc_name 
+        }
 
         provider_id = int(row[1])
         provider_name = row[2]
@@ -163,14 +167,14 @@ with open(outpatient_file, 'rb') as csvfile:
         # unused: ref_region_name = row[7]
 
         num_discharged = int(row[8])
-        avg_covered = float(row[9])
+        avg_charge = float(row[9])
         avg_payment = float(row[10])
 
         outpatient_payments[curr_outpatient_payment_id] = {
             'apc_id': apc_id,
             'provider_id': provider_id,
             'num_discharged': num_discharged,
-            'avg_covered': avg_covered,
+            'avg_charge': avg_charge,
             'avg_payment': avg_payment
         }
 
@@ -180,12 +184,81 @@ with open(outpatient_file, 'rb') as csvfile:
 # Finally, write it all to the database
 
 with sqlite3.connect(db_name) as conn:
-    # zip_regions = {}
-    # ref_regions = {}
-    # service_regions = {}
-    # providers = {}
-    # drgs = {}
-    # inpatient_payments = {}
-    # apcs = {}
-    # outpatient_payments = {}
-    pass
+
+    cursor = conn.cursor()
+
+    # zip_regions
+    zip_id = 0
+    for zipcode, v in zip_regions.iteritems():
+        cursor.execute("""INSERT INTO zip_regions(
+            id, zip, 
+            hsa_id, hsa_city, hsa_state,
+            hrr_id, hrr_city, hrr_state)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)""", 
+            (zip_id, zipcode, 
+                v['hsa_id'], v['hsa_city'], v['hsa_state'],
+                v['hrr_id'], v['hrr_city'], v['hrr_state'])
+        )
+        zip_id += 1
+
+    # service_regions
+    for hsa_id, v in service_regions.iteritems():
+        cursor.execute("""INSERT INTO service_regions(
+            id, state, city, zip)
+            VALUES (?, ?, ?, ?)""",
+            (hsa_id, v['state'], v['city'], v['zip'])
+        )
+
+    # ref_regions
+    for hrr_id, v in ref_regions.iteritems():
+        cursor.execute("""INSERT INTO ref_regions(
+            id, state, city, zip)
+            VALUES (?, ?, ?, ?)""",
+            (hrr_id, v['state'], v['city'], v['zip'])
+        )
+
+    # providers
+    for prov_id, v in providers.iteritems():
+        cursor.execute("""INSERT INTO providers(
+            id, name, street, city, state, zip)
+            VALUES (?, ?, ?, ?, ?, ?)""",
+            (prov_id, v['name'], v['street'], 
+                v['city'], v['state'], v['zip'])
+        )
+
+    # drgs
+    for drg_id, v in drgs.iteritems():
+        cursor.execute("""INSERT INTO drgs(
+            id, name) VALUES (?, ?)""",
+            (drg_id, v['name'])
+        )
+
+    # inpatient_payments
+    for id, v in inpatient_payments.iteritems():
+        cursor.execute("""INSERT INTO inpatient_payment_info(
+            id, drg_id, provider_id, num_discharged, 
+            avg_charge, avg_payment)
+            VALUES (?, ?, ?, ?, ?, ?)""",
+            (id, v['drg_id'], v['provider_id'],
+                v['num_discharged'], v['avg_charge'],
+                v['avg_payment'])
+        )
+
+
+    # apcs
+    for apc_id, v in apcs.iteritems():
+        cursor.execute("""INSERT INTO apcs(
+            id, name) VALUES (?, ?)""",
+            (apc_id, v['name'])
+        )
+
+    # outpatient_payments
+    for id, v in outpatient_payments.iteritems():
+        cursor.execute("""INSERT INTO outpatient_payment_info(
+            id, apc_id, provider_id, num_discharged, 
+            avg_charge, avg_payment)
+            VALUES (?, ?, ?, ?, ?, ?)""",
+            (id, v['apc_id'], v['provider_id'],
+                v['num_discharged'], v['avg_charge'],
+                v['avg_payment'])
+        )
