@@ -37,7 +37,7 @@ if not os.path.isfile(db_name):
 
 zip_regions = {}
 ref_regions = {}
-service_regions = {}
+service_areas = {}
 
 # columns = zipcode11 hsanum  hsacity hsastate hrrnum  hrrcity hrrstate
 with open(region_crosswalk_file, 'rb') as csvfile:
@@ -57,7 +57,7 @@ with open(region_crosswalk_file, 'rb') as csvfile:
             'hrr_state': row['hrrstate']
         }
 
-        service_regions[hsa_id] = {
+        service_areas[hsa_id] = {
             'city': row['hsacity'],
             'state': row['hsastate'],
             'zip': zip_code
@@ -191,19 +191,15 @@ with sqlite3.connect(db_name) as conn:
     zip_id = 0
     for zipcode, v in zip_regions.iteritems():
         cursor.execute("""INSERT INTO zip_regions(
-            id, zip, 
-            hsa_id, hsa_city, hsa_state,
-            hrr_id, hrr_city, hrr_state)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)""", 
-            (zip_id, zipcode, 
-                v['hsa_id'], v['hsa_city'], v['hsa_state'],
-                v['hrr_id'], v['hrr_city'], v['hrr_state'])
+            id, zip, hsa_id, hrr_id)
+            VALUES (?, ?, ?, ?)""", 
+            (zip_id, zipcode, v['hsa_id'], v['hrr_id'])
         )
         zip_id += 1
 
-    # service_regions
-    for hsa_id, v in service_regions.iteritems():
-        cursor.execute("""INSERT INTO service_regions(
+    # service_areas
+    for hsa_id, v in service_areas.iteritems():
+        cursor.execute("""INSERT INTO service_areas(
             id, state, city, zip)
             VALUES (?, ?, ?, ?)""",
             (hsa_id, v['state'], v['city'], v['zip'])
@@ -236,7 +232,7 @@ with sqlite3.connect(db_name) as conn:
     # inpatient_payments
     for id, v in inpatient_payments.iteritems():
         cursor.execute("""INSERT INTO inpatient_payment_info(
-            id, drg_id, provider_id, num_discharged, 
+            id, procedure_id, provider_id, num_discharged, 
             avg_charge, avg_payment)
             VALUES (?, ?, ?, ?, ?, ?)""",
             (id, v['drg_id'], v['provider_id'],
@@ -255,7 +251,7 @@ with sqlite3.connect(db_name) as conn:
     # outpatient_payments
     for id, v in outpatient_payments.iteritems():
         cursor.execute("""INSERT INTO outpatient_payment_info(
-            id, apc_id, provider_id, num_discharged, 
+            id, procedure_id, provider_id, num_discharged, 
             avg_charge, avg_payment)
             VALUES (?, ?, ?, ?, ?, ?)""",
             (id, v['apc_id'], v['provider_id'],

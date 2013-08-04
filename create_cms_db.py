@@ -12,11 +12,7 @@ def create_cms_db(outfile_name):
             id INTEGER PRIMARY KEY
             , zip VARCHAR(5)
             , hsa_id INTEGER
-            , hsa_city VARCHAR(40)
-            , hsa_state VARCHAR(2)
             , hrr_id INTEGER
-            , hrr_city VARCHAR(40)
-            , hrr_state VARCHAR(2)
             )""")
 
         cursor.execute("""CREATE TABLE ref_regions (
@@ -26,7 +22,7 @@ def create_cms_db(outfile_name):
             , zip VARCHAR(5)
             )""")
 
-        cursor.execute("""CREATE TABLE service_regions (
+        cursor.execute("""CREATE TABLE service_areas (
             id INTEGER PRIMARY KEY
             , state VARCHAR(2)
             , city VARCHAR(40)
@@ -56,7 +52,7 @@ def create_cms_db(outfile_name):
 
         cursor.execute("""CREATE TABLE inpatient_payment_info (
             id INTEGER PRIMARY KEY
-            , drg_id INTEGER NOT NULL
+            , procedure_id INTEGER NOT NULL
             , provider_id INTEGER NOT NULL
             , num_discharged INTEGER NULL
             , avg_charge REAL NULL
@@ -65,7 +61,7 @@ def create_cms_db(outfile_name):
 
         cursor.execute("""CREATE TABLE outpatient_payment_info (
             id INTEGER PRIMARY KEY
-            , apc_id INTEGER NOT NULL
+            , procedure_id INTEGER NOT NULL
             , provider_id INTEGER NOT NULL
             , num_discharged INTEGER NULL
             , avg_charge REAL NULL
