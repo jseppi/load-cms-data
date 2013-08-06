@@ -44,7 +44,7 @@ with open(region_crosswalk_file, 'rb') as csvfile:
     r = csv.DictReader(csvfile)
     
     for row in r:
-        zip_code = row['zipcode11']
+        zip_code = str(row['zipcode11']).zfill(5)
         hsa_id = int(row['hsanum'])
         hrr_id = int(row['hrrnum'])
 
@@ -59,14 +59,12 @@ with open(region_crosswalk_file, 'rb') as csvfile:
 
         service_areas[hsa_id] = {
             'city': row['hsacity'],
-            'state': row['hsastate'],
-            'zip': zip_code
+            'state': row['hsastate']
         }
 
         ref_regions[hrr_id] = {
             'city': row['hrrcity'],
-            'state': row['hrrstate'],
-            'zip': zip_code
+            'state': row['hrrstate']
         }
 
 # ------------------------------------------------------
@@ -100,7 +98,7 @@ with open(inpatient_file, 'rb') as csvfile:
         provider_street = row[3]
         provider_city = row[4]
         provider_state = row[5]
-        provider_zip = row[6]
+        provider_zip = str(row[6]).zfill(5)
 
         # unused: ref_region_name = row[7]
 
@@ -154,7 +152,7 @@ with open(outpatient_file, 'rb') as csvfile:
         provider_street = row[3]
         provider_city = row[4]
         provider_state = row[5]
-        provider_zip = row[6]
+        provider_zip = str(row[6]).zfill(5)
 
         providers[provider_id] = {
             'name': provider_name,
@@ -200,17 +198,17 @@ with sqlite3.connect(db_name) as conn:
     # service_areas
     for hsa_id, v in service_areas.iteritems():
         cursor.execute("""INSERT INTO service_areas(
-            id, state, city, zip)
-            VALUES (?, ?, ?, ?)""",
-            (hsa_id, v['state'], v['city'], v['zip'])
+            id, state, city)
+            VALUES (?, ?, ?)""",
+            (hsa_id, v['state'], v['city'])
         )
 
     # ref_regions
     for hrr_id, v in ref_regions.iteritems():
         cursor.execute("""INSERT INTO ref_regions(
-            id, state, city, zip)
-            VALUES (?, ?, ?, ?)""",
-            (hrr_id, v['state'], v['city'], v['zip'])
+            id, state, city)
+            VALUES (?, ?, ?)""",
+            (hrr_id, v['state'], v['city'])
         )
 
     # providers

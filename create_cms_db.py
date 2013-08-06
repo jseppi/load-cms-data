@@ -10,23 +10,24 @@ def create_cms_db(outfile_name):
 
         cursor.execute("""CREATE TABLE zip_regions (
             id INTEGER PRIMARY KEY
-            , zip VARCHAR(5)
+            , zip CHAR(5)
             , hsa_id INTEGER
             , hrr_id INTEGER
             )""")
 
+        cursor.execute("""CREATE INDEX idx_zip_regions_zip 
+            on zip_regions (zip)""")
+
         cursor.execute("""CREATE TABLE ref_regions (
             id INTEGER PRIMARY KEY
-            , state VARCHAR(2)
+            , state CHAR(2)
             , city VARCHAR(40)
-            , zip VARCHAR(5)
             )""")
 
         cursor.execute("""CREATE TABLE service_areas (
             id INTEGER PRIMARY KEY
-            , state VARCHAR(2)
+            , state CHAR(2)
             , city VARCHAR(40)
-            , zip VARCHAR(5)
             )""")
 
         cursor.execute("""CREATE TABLE drgs (
@@ -44,8 +45,8 @@ def create_cms_db(outfile_name):
             , name VARCHAR(60)
             , street VARCHAR(100)
             , city VARCHAR(40)
-            , state VARCHAR(2)
-            , zip VARCHAR(5)
+            , state CHAR(2)
+            , zip CHAR(5)
             )""")
             #, hrr_id INTEGER #TODO: actually should use zip_regions lookup
             #, hsa_id INTEGER #TODO: actually should use zip_regions lookup
